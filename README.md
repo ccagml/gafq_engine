@@ -1,5 +1,5 @@
 cat  /etc/centos-release
-CentOS Linux release 7.3.1611 (Core) 
+    CentOS Linux release 7.3.1611 (Core) 
 
 g++ (GCC) 4.8.5 20150623 (Red Hat 4.8.5-39)
 Copyright © 2015 Free Software Foundation, Inc.
@@ -8,11 +8,7 @@ Copyright © 2015 Free Software Foundation, Inc.
 
 
 -- 这里是capi的mysqllib
-https://downloads.mysql.com/archives/c-c/
-wget https://downloads.mysql.com/archives/get/p/19/file/mysql-connector-c-6.1.11-linux-glibc2.12-x86_64.tar.gz
-
-wget https://github.com/ccagml/gafq/archive/master.zip
-
+    wget https://downloads.mysql.com/archives/get/p/19/file/mysql-connector-c-6.1.11-linux-glibc2.12-x86_64.tar.gz
 
 
 <!-- -- 安装boost
@@ -24,9 +20,5 @@ cd ~/b/3rd_source/boost
 ./b2 install -->
 
 安装boost 1.53.0
-yum install boost
-
--- 安装gafq 的 so
-cd ~/b/3rd_source/gafq
-make MYCFLAGS="-fPIC" linux
+    yum install boost
 
