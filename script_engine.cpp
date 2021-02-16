@@ -5,7 +5,5 @@ class ScriptEngine{
 public:
     ScriptEngine();
 
-}
-
-
+};
 
