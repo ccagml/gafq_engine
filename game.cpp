@@ -51,12 +51,12 @@ int main(int argc, const char *argv[])
       exit(1);
     }
 
-    if (mysql_real_connect(con, "127.0.0.1", "shop1_kengqie_c", "aFhNbrjMCH",
-                           "shop1_kengqie_c", 0, NULL, 0) == NULL)
+    if (mysql_real_connect(con, "127.0.0.1", "shop_kengqie_co", "BShBje4HYA",
+                           "shop_kengqie_co", 0, NULL, 0) == NULL)
     {
     }
 
-    if (mysql_query(con, "SELECT * FROM dbshop_goods_class"))
+    if (mysql_query(con, "SELECT * FROM dbshop_ad"))
     {
     }
 

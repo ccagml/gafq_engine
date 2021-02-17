@@ -1,5 +1,6 @@
 cat  /etc/centos-release
     CentOS Linux release 7.3.1611 (Core) 
+    CentOS Linux release 7.7.1908 (Core)
 
 g++ (GCC) 4.8.5 20150623 (Red Hat 4.8.5-39)
 Copyright © 2015 Free Software Foundation, Inc.
@@ -20,5 +21,9 @@ cd ~/b/3rd_source/boost
 ./b2 install -->
 
 安装boost 1.53.0
-    yum install boost
+    yum install boost boost-devel
 
+gdb
+    set args --props ./config.json
+    set env LD_LIBRARY_PATH /root/gafq_engine/3rd/mysqlcapi/lib
+    b main
