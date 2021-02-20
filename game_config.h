@@ -1,11 +1,11 @@
 #ifndef __GAMECONFIG_H__
 #define __GAMECONFIG_H__
-#include <string>
 #include <boost/property_tree/ptree.hpp>
+#include <string>
 
-class GameConfig {
+class GameConfig
+{
 private:
-
 public:
     // 构造函数
     GameConfig()
@@ -20,8 +20,10 @@ public:
     }
     static GameConfig *cfg;
     static int objectCount;
-    static GameConfig* get_instance(){
-        if(cfg == nullptr){
+    static GameConfig *get_instance()
+    {
+        if (cfg == nullptr)
+        {
             std::cout << "new" << std::endl;
             cfg = new GameConfig();
         }

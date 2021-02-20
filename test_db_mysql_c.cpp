@@ -1,7 +1,7 @@
+#include <iostream>
 #include <mysql.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
 using namespace std;
 
 int main()
@@ -14,8 +14,7 @@ int main()
         exit(1);
     }
 
-    if (mysql_real_connect(con, "127.0.0.1", "shop1_kengqie_c", "aFhNbrjMCH",
-                           "shop1_kengqie_c", 0, NULL, 0) == NULL)
+    if (mysql_real_connect(con, "127.0.0.1", "shop1_kengqie_c", "aFhNbrjMCH", "shop1_kengqie_c", 0, NULL, 0) == NULL)
     {
     }
 

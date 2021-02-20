@@ -1,33 +1,21 @@
-#include <string>
-#include <iostream>
 #include "game_config.h"
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <iostream>
+#include <string>
 
 int GameConfig::objectCount = 0;
 GameConfig *GameConfig::cfg = nullptr;
 
-int GameConfig::get_config_int(std::string key)
-{
-    return this->pt.get<int>(key);
-}
+int GameConfig::get_config_int(std::string key) { return this->pt.get<int>(key); }
 
-float GameConfig::get_config_float(std::string key)
-{
-    return this->pt.get<float>(key);
-}
+float GameConfig::get_config_float(std::string key) { return this->pt.get<float>(key); }
 
-std::string GameConfig::get_config_string(std::string key)
-{
-    return this->pt.get<std::string>(key);
-}
+std::string GameConfig::get_config_string(std::string key) { return this->pt.get<std::string>(key); }
 
-boost::property_tree::ptree GameConfig::get_config_pt()
-{
-    return this->pt;
-}
+boost::property_tree::ptree GameConfig::get_config_pt() { return this->pt; }
 
 void GameConfig::load_config(std::string path)
 {

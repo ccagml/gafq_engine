@@ -8,7 +8,7 @@ game_config: game_config.cpp game_config.h
 	g++ -Wall -std=c++11 game_config.cpp -o game_config -I /root/gafq_engine -I /root/gafq_engine/b/includedir -L/root/gafq_engine/b/libdir -lboost_program_options -lboost_system -lboost_filesystem 
 
 script_engine: script_engine.cpp
-	g++ -Wall -std=c++11 script_engine.cpp -o script_engine -I /root/gafq_engine -I /root/gafq_engine/3rd/gafq/include -L/root/gafq_engine/3rd/gafq/lib -lboost_program_options -lboost_system -lboost_filesystem 
+	g++ -Wall -Werror -g -std=c++11 script_engine.cpp -o script_engine -I /root/gafq_engine -I /root/gafq_engine/3rd/gafq/include -L/root/gafq_engine/3rd/gafq/lib -lboost_program_options -lboost_system -lboost_filesystem -lpthread -lboost_thread
 
 
 test_db_mysql_c:test_db_mysql_c.cpp

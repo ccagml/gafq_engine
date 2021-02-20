@@ -1,4 +1,6 @@
 #include "script_engine.h"
+#include <boost/bind.hpp>  
+#include <boost/thread/thread.hpp>
 
 ScriptEngine *ScriptEngine::script_eng = nullptr;
 
@@ -40,20 +42,35 @@ void ScriptEngine::ExecGafq(std::string lua_content, int fd, int func, std::shar
         // 放入队列中
         mtx_.lock();
         wait_execute_list.push_back(gt_ptr);
-        std::cout<<"上锁长度"<<wait_execute_list.size()<<std::endl;
+
+        // std::cout<<"上锁长度"<<wait_execute_list.size()<<std::endl;
+        count2 = count2 + 1;
         mtx_.unlock();
+        count = count + 1;
 }
+// void increment_count()
+// {
+//     // boost::unique_lock<boost::mutex> lock(mutex);
+//     for(int i = 0; i < 10000; i++){
+//         // count = count + 1;
+//         ScriptEngine::get_instance()->ExecGafq("print('1')");
+//         //std::cout << "count = " << count << std::endl;
+//     }
+// }
 
+// int main(int argc, char const *argv[])
+// {
+//     /* code */
 
-int main(int argc, char const *argv[])
-{
-    /* code */
+//     ScriptEngine::get_instance()->Init("./config.json");
+//     ScriptEngine::get_instance()->ExecGafq("print('1')");
 
-    ScriptEngine::get_instance()->Init("./config.json");
-    ScriptEngine::get_instance()->ExecGafq("print('1')");
-
-
-
-
-    return 0;
-}
+//     boost::thread_group threads;
+//     for (int i = 0; i < 30; ++i){
+//         threads.create_thread(&increment_count);
+//     }
+//     threads.join_all();
+//     // threads.wait();
+//     std::cout << "上锁长度" << ScriptEngine::get_instance()->wait_execute_list.size() << ": count" << ScriptEngine::get_instance()->count << ": count2:" << ScriptEngine::get_instance()->count2 << std::endl;
+//     return 0;
+// }

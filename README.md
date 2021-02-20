@@ -27,3 +27,7 @@ gdb
     set args --props ./config.json
     set env LD_LIBRARY_PATH /root/gafq_engine/3rd/mysqlcapi/lib
     b main
+
+
+format
+{ BasedOnStyle: LLVM, UseTab: Never, PenaltyBreakFirstLessLess: 120, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 200, AccessModifierOffset: -4, NamespaceIndentation: All, FixNamespaceComments: true }
