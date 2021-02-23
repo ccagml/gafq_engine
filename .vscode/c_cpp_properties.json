@@ -3,7 +3,9 @@
         {
             "name": "Linux",
             "includePath": [
-                "${default}"
+                "${default}",
+                "/root/gafq_engine/**",
+                "/root/gafq_engine/3rd/**"
             ],
             "defines": [],
             "compilerPath": "/bin/clang",

@@ -24,10 +24,12 @@ cd ~/b/3rd_source/boost
     yum install boost boost-devel
 
 gdb
+    gdb ./game
     set args --props ./config.json
     set env LD_LIBRARY_PATH /root/gafq_engine/3rd/mysqlcapi/lib
     b main
+    run
 
 
 format
-{ BasedOnStyle: LLVM, UseTab: Never, PenaltyBreakFirstLessLess: 120, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 200, AccessModifierOffset: -4, NamespaceIndentation: All, FixNamespaceComments: true }
+{ BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 200, AccessModifierOffset: -4, NamespaceIndentation: All, FixNamespaceComments: true }

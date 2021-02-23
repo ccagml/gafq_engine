@@ -45,6 +45,8 @@
         "fstream": "cpp",
         "iomanip": "cpp",
         "*.ipp": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "atomic": "cpp",
+        "string": "cpp"
     },
 }
