@@ -47,6 +47,9 @@
         "*.ipp": "cpp",
         "algorithm": "cpp",
         "atomic": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "thread": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp"
     },
 }

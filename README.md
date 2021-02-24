@@ -33,3 +33,13 @@ gdb
 
 format
 { BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 200, AccessModifierOffset: -4, NamespaceIndentation: All, FixNamespaceComments: true }
+
+
+
+coredump
+
+ sysctl -w kernel.core_pattern=core.%p.%s.%c.%d.%P
+
+ulimit -S -c unlimited > /dev/null 2>&1
+
+kill -11 pid
