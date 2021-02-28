@@ -38,6 +38,12 @@ public:
             body_length_ = max_body_length;
     }
 
+    void delete_msg()
+    {
+        memset(data_, '\0', sizeof(char) * (header_length + max_body_length));
+        body_length_ = 0;
+    }
+
     bool decode_header()
     {
         char header[header_length + 1] = "";

@@ -194,6 +194,7 @@ typedef std::list<socket_server_ptr> socket_server_list;
 
 //----------------------------------------------------------------------
 
+//----------------------------------------------------------------------
 void init_boost_asio()
 {
     std::cout << "init_boost_asio线程id:" << std::this_thread::get_id() << std::endl;
@@ -214,7 +215,6 @@ void init_epool()
     struct sockaddr_in client_addr;
     socklen_t addr_size;
     int str_len, i;
-    char buf[BUF_SIZE];
 
     int epfd, event_cnt;
 
@@ -251,7 +251,6 @@ void init_epool()
 
     // Step 6. Adding the server socket file descriptor to the event poll's control.
     epoll_ctl(epfd, EPOLL_CTL_ADD, server_socket, &event);
-    int recv_cnt = 0;
     socket_msg read_msg_;
     while (true)
     {
@@ -278,15 +277,19 @@ void init_epool()
             else if (epoll_events[i].events & EPOLLIN)
             {
                 // std::cout << " EPOLLIN fd:" << epoll_events[i].data.fd << std::endl;
+                read_msg_.delete_msg();
                 str_len = read(epoll_events[i].data.fd, read_msg_.data(), socket_msg::header_length);
-                std::cout << " EPOLLIN fd str_len:" << str_len << std::endl;
                 if (str_len > 0 && read_msg_.decode_header())
                 {
-                    int str_len1 = read(epoll_events[i].data.fd, read_msg_.body(), read_msg_.body_length());
-                    std::cout << epoll_events[i].data.fd << "Message: " << str_len << ":" << str_len1 << " buf:" << read_msg_.data() << std::endl;
+                    // int str_len1 = read(epoll_events[i].data.fd, read_msg_.body(), read_msg_.body_length());
+                    int str_len1 = read(epoll_events[i].data.fd, read_msg_.body(), (read_msg_.body_length() + 1));
+                    std::cout << epoll_events[i].data.fd << "发送消息,读取长度:" << str_len << ",读取数据长度:" << str_len1 << ",所有的数据是:" << read_msg_.data() << std::endl;
+
+                    // send(epoll_events[i].data.fd, read_msg_.data(), read_msg_.length(), 0);
                 }
                 else
                 {
+                    std::cout << "error fd:" << epoll_events[i].data.fd << "close" << std::endl;
                     close(epoll_events[i].data.fd);
                 }
                 // memset(buf, 0, sizeof(buf));

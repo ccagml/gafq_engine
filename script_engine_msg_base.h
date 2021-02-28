@@ -5,7 +5,10 @@ class ScriptEngineMsgBase
 {
 
 public:
-    ScriptEngineMsgBase();
+    ScriptEngineMsgBase() { std::cout << "create enginemsg base" << std::endl; };
+    ~ScriptEngineMsgBase() { std::cout << "delete enginemsg base" << std::endl; };
+    std::string action;
+    std::string data;
 
 private:
 };

@@ -11,8 +11,8 @@ chat_client: chat_client.cpp socket_msg.h
 game_config: game_config.cpp game_config.h
 	g++ -Wall -std=c++11 game_config.cpp -o game_config -I /root/gafq_engine -I /root/gafq_engine/b/includedir -L/root/gafq_engine/b/libdir -lboost_program_options -lboost_system -lboost_filesystem 
 
-script_engine: script_engine.cpp
-	g++ -Wall -Werror -g -std=c++11 script_engine.cpp -o script_engine -I /root/gafq_engine -I /root/gafq_engine/3rd/gafq/include -L/root/gafq_engine/3rd/gafq/lib -lboost_program_options -lboost_system -lboost_filesystem -lpthread -lboost_thread
+script_engine: script_engine.cpp script_engine.h script_engine_msg_base.h
+	g++ -Wall -Werror -g -std=c++11 script_engine.cpp -o script_engine -I /root/gafq_engine -I /root/gafq_engine/3rd/gafq/include -L/root/gafq_engine/3rd/gafq/lib -lgafq -lboost_program_options -lboost_system -lboost_filesystem -lpthread -lboost_thread
 
 
 test_db_mysql_c:test_db_mysql_c.cpp

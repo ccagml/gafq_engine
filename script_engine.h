@@ -52,6 +52,7 @@ public:
     bool Init(std::string init_file);
     void ExecGafq(std::string lua_content = std::string(), int fd = -1, int func = -1, std::shared_ptr<ScriptEngineMsgBase> msg = nullptr, int cookie = -1, int ret = -1,
                   std::string errmsg = std::string());
+    void LoopExecute(); // 循环执行
     std::vector<GAFQITEM_PTR> wait_execute_list;
 
 private:
