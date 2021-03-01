@@ -25,6 +25,9 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 
+// 引入引擎
+#include "script_engine.h"
+
 bool init_load_config(int argc, const char *argv[])
 {
     boost::program_options::options_description desc("Allowed options");
@@ -284,7 +287,10 @@ void init_epool()
                     // int str_len1 = read(epoll_events[i].data.fd, read_msg_.body(), read_msg_.body_length());
                     int str_len1 = read(epoll_events[i].data.fd, read_msg_.body(), (read_msg_.body_length() + 1));
                     std::cout << epoll_events[i].data.fd << "发送消息,读取长度:" << str_len << ",读取数据长度:" << str_len1 << ",所有的数据是:" << read_msg_.data() << std::endl;
-
+                    std::shared_ptr<ScriptEngineMsgBase> foo = std::make_shared<ScriptEngineMsgBase>();
+                    foo->action = "foo";
+                    foo->data = read_msg_.body();
+                    ScriptEngine::get_instance()->ExecGafq("", epoll_events[i].data.fd, foo, 1, "");
                     // send(epoll_events[i].data.fd, read_msg_.data(), read_msg_.length(), 0);
                 }
                 else
@@ -360,6 +366,7 @@ int main(int argc, const char *argv[])
         std::thread{&init_server}.detach();
 
         std::cout << "主线程id:" << std::this_thread::get_id() << std::endl;
+        ScriptEngine::get_instance()->Init("script.gafq");
         while (true)
         {
 
@@ -367,6 +374,7 @@ int main(int argc, const char *argv[])
             // std::this_thread::sleep(boost::posix_time::milliseconds(1000));
             std::chrono::milliseconds dura(1000);
             std::this_thread::sleep_for(dura);
+            ScriptEngine::get_instance()->LoopExecute();
 
             // std::cout << "主线程id:" << std::this_thread::get_id() << std::endl;
         }

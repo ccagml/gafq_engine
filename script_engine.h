@@ -21,13 +21,11 @@ class ScriptEngine
     // 2、使用 typedef 为这个新的结构起了一个别名，叫 GAFQITEM
     typedef struct gafqItem
     {
-        std::string lua_content;
-        int func;
+        std::string gafq_content;
         int fd;
         std::shared_ptr<ScriptEngineMsgBase> msg;
-        std::string errmsg;
-        int cookie;
-        int ret;
+        std::string errinfo;
+        int status;
     } GAFQITEM;
     typedef boost::shared_ptr<GAFQITEM> GAFQITEM_PTR;
 
@@ -50,8 +48,7 @@ public:
     }
 
     bool Init(std::string init_file);
-    void ExecGafq(std::string lua_content = std::string(), int fd = -1, int func = -1, std::shared_ptr<ScriptEngineMsgBase> msg = nullptr, int cookie = -1, int ret = -1,
-                  std::string errmsg = std::string());
+    void ExecGafq(std::string gafq_content = std::string(), int fd = -1, std::shared_ptr<ScriptEngineMsgBase> msg = nullptr, int status = 1, std::string errinfo = std::string());
     void LoopExecute(); // 循环执行
     std::vector<GAFQITEM_PTR> wait_execute_list;
 
