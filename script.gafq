@@ -1,5 +1,49 @@
 -- script.gafq
 -- Receives a table, returns the sum of its components.
-function foo(fd, data)
-  print("gafq:", fd, data)
+
+local json = require "json"
+
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
+function update_self()
+      print("update_self start222!")
+      package.loaded["script"] = false
+      require("script")
+      print("update_self end4444!")
+end
+
+
+function start_action(fd, data)
+   print("gafq:", fd, data)
+   local json_data = json.decode(data)
+   print("decode", dump(json.decode(data)))
+   local y = gafq_func3(1,2)
+   print("gafq_func3 y:", y)
+   local oper = json_data.oper
+   print("oper", oper)
+   if not oper then
+      return
+   end
+   if oper == "update_self" then
+      print("update_self", oper)
+      update_self()
+   elseif oper == "send_data" then
+      print("send_data 发给谁, 发什么", oper)
+      -- 发给谁, 发什么
+      send_data(json_data.to, data)
+   else
+      print("oper没有匹配")
+   end
+
 end

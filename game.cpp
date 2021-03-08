@@ -203,7 +203,8 @@ void init_boost_asio()
     std::cout << "init_boost_asio线程id:" << std::this_thread::get_id() << std::endl;
     boost::asio::io_service socket_io_service;
     std::list<socket_server> servers;
-    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), 6000);
+    int port = GameConfig::get_instance()->get_config_int("port");
+    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
     servers.emplace_back(socket_io_service, endpoint);
     socket_io_service.run();
 }
@@ -228,7 +229,8 @@ void init_epool()
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    server_addr.sin_port = htons(6000);
+    int port = GameConfig::get_instance()->get_config_int("port");
+    server_addr.sin_port = htons(port);
 
     // Step 3. Binding the server address onto the socket created just right before.
     if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
@@ -238,150 +240,175 @@ void init_epool()
     }
 
     // Step 4. Start to listen to the socket.
-    if (listen(server_socket, 6000) == -1)
+    if (listen(server_socket, port) == -1)
     {
-        std::cout << "listen() error" << std::endl;
+        std::cout << "listen() error port:" << port << std::endl;
         return;
-    }
+        else { std::cout << "listen() ok port:" << port << std::endl; }
 
-    // Step 5. Create an event poll instance.
-    epfd = epoll_create(255);
-    auto epoll_events = (struct epoll_event *)malloc(sizeof(struct epoll_event) * EPOLL_SIZE);
+        // Step 5. Create an event poll instance.
+        epfd = epoll_create(255);
+        auto epoll_events = (struct epoll_event *)malloc(sizeof(struct epoll_event) * EPOLL_SIZE);
 
-    struct epoll_event event;
-    event.events = EPOLLIN;
-    event.data.fd = server_socket;
+        struct epoll_event event;
+        event.events = EPOLLIN;
+        event.data.fd = server_socket;
 
-    // Step 6. Adding the server socket file descriptor to the event poll's control.
-    epoll_ctl(epfd, EPOLL_CTL_ADD, server_socket, &event);
-    socket_msg read_msg_;
-    while (true)
-    {
-        // Step 7. Wait until some event happens
-        event_cnt = epoll_wait(epfd, epoll_events, EPOLL_SIZE, -1);
-        if (event_cnt == -1)
-        {
-            std::cout << "epoll_wait() error" << std::endl;
-            break;
-        }
-
-        for (i = 0; i < event_cnt; i++)
-        {
-            if (epoll_events[i].data.fd == server_socket)
-            {
-                std::cout << "data.fd == server_socket" << std::endl;
-                addr_size = sizeof(client_addr);
-                client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &addr_size);
-                event.events = EPOLLIN;
-                event.data.fd = client_socket;
-                epoll_ctl(epfd, EPOLL_CTL_ADD, client_socket, &event);
-                // printf("Connected client: %d\n", client_socket);
-            }
-            else if (epoll_events[i].events & EPOLLIN)
-            {
-                // std::cout << " EPOLLIN fd:" << epoll_events[i].data.fd << std::endl;
-                read_msg_.delete_msg();
-                str_len = read(epoll_events[i].data.fd, read_msg_.data(), socket_msg::header_length);
-                if (str_len > 0 && read_msg_.decode_header())
-                {
-                    // int str_len1 = read(epoll_events[i].data.fd, read_msg_.body(), read_msg_.body_length());
-                    int str_len1 = read(epoll_events[i].data.fd, read_msg_.body(), (read_msg_.body_length() + 1));
-                    std::cout << epoll_events[i].data.fd << "发送消息,读取长度:" << str_len << ",读取数据长度:" << str_len1 << ",所有的数据是:" << read_msg_.data() << std::endl;
-                    std::shared_ptr<ScriptEngineMsgBase> foo = std::make_shared<ScriptEngineMsgBase>();
-                    foo->action = "foo";
-                    foo->data = read_msg_.body();
-                    ScriptEngine::get_instance()->ExecGafq("", epoll_events[i].data.fd, foo, 1, "");
-                    // send(epoll_events[i].data.fd, read_msg_.data(), read_msg_.length(), 0);
-                }
-                else
-                {
-                    std::cout << "error fd:" << epoll_events[i].data.fd << "close" << std::endl;
-                    close(epoll_events[i].data.fd);
-                }
-                // memset(buf, 0, sizeof(buf));
-                // str_len = read(epoll_events[i].data.fd, buf, 16);
-                // if (str_len > 0)
-                // {
-                //     std::cout << epoll_events[i].data.fd << ":send Message:" << str_len << "buf:" << buf << std::endl;
-                // }
-                // else
-                // {
-                //     close(epoll_events[i].data.fd);
-                // }
-            }
-            else if (epoll_events[i].events & EPOLLERR)
-            {
-                std::cout << " EPOLLERR fd:" << epoll_events[i].data.fd << std::endl;
-                close(epoll_events[i].data.fd);
-            }
-            else // client socket?
-            {
-                // if (str_len == 0) // close request!
-                // {
-                //     epoll_ctl(epfd, EPOLL_CTL_DEL, epoll_events[i].data.fd, nullptr);
-                //     close(epoll_events[i].data.fd);
-                //     printf("%d: %s\n", ++recv_cnt, buf);
-                //     // printf("closed client: %d \n", epoll_events[i].data.fd);
-                // }
-                // else
-                // {
-                //     write(epoll_events[i].data.fd, buf, str_len); // echo!
-                // }
-            } // end of else()
-        }     // end of for()
-    }         // end of while()
-
-    close(server_socket);
-    close(epfd);
-    free(epoll_events);
-}
-
-// 初始化监听
-bool init_server()
-{
-    std::cout << "init_server线程id:" << std::this_thread::get_id() << std::endl;
-    std::cout << "init_server 1" << std::endl;
-    // init_boost_asio();
-    init_epool();
-    return true;
-}
-
-int main(int argc, const char *argv[])
-{
-    try
-    {
-        init_load_config(argc, argv);
-        std::cout << "主线程id:" << std::this_thread::get_id() << std::endl;
-        std::cout << "0:name:" << GameConfig::get_instance()->get_config_string("name") << std::endl;
-        std::cout << "0:object.currency:" << GameConfig::get_instance()->get_config_string("object.currency") << std::endl;
-        std::cout << "1:pi:" << GameConfig::get_instance()->get_config_float("pi") << std::endl;
-        // init_db();
-        // init_server();
-
-        // boost::thread_group threads;
-        // threads.create_thread(&init_server);
-        // // threads.create_thread(&init_db);
-        // threads.join_all();
-
-        std::thread{&init_server}.detach();
-
-        std::cout << "主线程id:" << std::this_thread::get_id() << std::endl;
-        ScriptEngine::get_instance()->Init("script.gafq");
+        // Step 6. Adding the server socket file descriptor to the event poll's control.
+        epoll_ctl(epfd, EPOLL_CTL_ADD, server_socket, &event);
+        socket_msg read_msg_;
         while (true)
         {
+            // Step 7. Wait until some event happens
+            event_cnt = epoll_wait(epfd, epoll_events, EPOLL_SIZE, -1);
+            if (event_cnt == -1)
+            {
+                std::cout << "epoll_wait() error" << std::endl;
+                break;
+            }
 
-            // std::this_thread::sleep(boost::posix_time::seconds(1));
-            // std::this_thread::sleep(boost::posix_time::milliseconds(1000));
-            std::chrono::milliseconds dura(1000);
-            std::this_thread::sleep_for(dura);
-            ScriptEngine::get_instance()->LoopExecute();
+            for (i = 0; i < event_cnt; i++)
+            {
+                if (epoll_events[i].data.fd == server_socket)
+                {
+                    std::cout << "data.fd == server_socket" << std::endl;
+                    addr_size = sizeof(client_addr);
+                    client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &addr_size);
+                    event.events = EPOLLIN;
+                    event.data.fd = client_socket;
+                    epoll_ctl(epfd, EPOLL_CTL_ADD, client_socket, &event);
+                    // printf("Connected client: %d\n", client_socket);
+                }
+                else if (epoll_events[i].events & EPOLLIN)
+                {
+                    // std::cout << " EPOLLIN fd:" << epoll_events[i].data.fd << std::endl;
+                    read_msg_.delete_msg();
+                    str_len = read(epoll_events[i].data.fd, read_msg_.data(), socket_msg::header_length);
+                    if (str_len > 0 && read_msg_.decode_header())
+                    {
+                        // int str_len1 = read(epoll_events[i].data.fd, read_msg_.body(), read_msg_.body_length());
+                        int str_len1 = read(epoll_events[i].data.fd, read_msg_.body(), (read_msg_.body_length() + 1));
+                        std::cout << epoll_events[i].data.fd << "发送消息,读取长度:" << str_len << ",读取数据长度:" << str_len1 << ",所有的数据是:" << read_msg_.data() << "读取的具体数据是"
+                                  << read_msg_.body() << std::endl;
+                        std::shared_ptr<ScriptEngineMsgBase> foo = std::make_shared<ScriptEngineMsgBase>();
+                        foo->action = "start_action";
+                        foo->data = read_msg_.body();
+                        ScriptEngine::get_instance()->ExecGafq("", epoll_events[i].data.fd, foo, 1, "");
+                        // send(epoll_events[i].data.fd, read_msg_.data(), read_msg_.length(), 0);
+                    }
+                    else
+                    {
+                        std::cout << "error fd:" << epoll_events[i].data.fd << "close" << std::endl;
+                        close(epoll_events[i].data.fd);
+                    }
+                    // memset(buf, 0, sizeof(buf));
+                    // str_len = read(epoll_events[i].data.fd, buf, 16);
+                    // if (str_len > 0)
+                    // {
+                    //     std::cout << epoll_events[i].data.fd << ":send Message:" << str_len << "buf:" << buf << std::endl;
+                    // }
+                    // else
+                    // {
+                    //     close(epoll_events[i].data.fd);
+                    // }
+                }
+                else if (epoll_events[i].events & EPOLLERR)
+                {
+                    std::cout << " EPOLLERR fd:" << epoll_events[i].data.fd << std::endl;
+                    close(epoll_events[i].data.fd);
+                }
+                else // client socket?
+                {
+                    // if (str_len == 0) // close request!
+                    // {
+                    //     epoll_ctl(epfd, EPOLL_CTL_DEL, epoll_events[i].data.fd, nullptr);
+                    //     close(epoll_events[i].data.fd);
+                    //     printf("%d: %s\n", ++recv_cnt, buf);
+                    //     // printf("closed client: %d \n", epoll_events[i].data.fd);
+                    // }
+                    // else
+                    // {
+                    //     write(epoll_events[i].data.fd, buf, str_len); // echo!
+                    // }
+                } // end of else()
+            }     // end of for()
+        }         // end of while()
 
-            // std::cout << "主线程id:" << std::this_thread::get_id() << std::endl;
-        }
-        return 0;
+        close(server_socket);
+        close(epfd);
+        free(epoll_events);
     }
-    catch (boost::filesystem::filesystem_error &ex)
+
+    // 初始化监听
+    bool init_server()
     {
-        std::cerr << ex.code().message() << '\n';
+        std::cout << "init_server线程id:" << std::this_thread::get_id() << std::endl;
+        std::cout << "init_server 1" << std::endl;
+        // init_boost_asio();
+        init_epool();
+        return true;
     }
-}
+
+    int send_data(gafq_State * L)
+    {
+        int to = gafq_tointeger(L, 1);         // 发送给谁
+        const char *buf = gafq_tostring(L, 2); // 内容是什么
+        socket_msg msg;
+        msg.body_length(strlen(buf));
+        memcpy(msg.body(), buf, msg.body_length());
+        msg.encode_header();
+        std::cout << "发给谁" << to << "msg所有数据:" << msg.data() << std::endl;
+        send(to, msg.data(), msg.length(), 0);
+        // write(to, msg.body(), msg.body_length());
+        gafq_pushinteger(L, 1);
+        return 1;
+    }
+
+    // 初始化gafq的c++函数
+    int init_gafq_func()
+    {
+        gafq_register(ScriptEngine::get_instance()->get_gafq_State(), "send_data", send_data);
+        return 1;
+    }
+
+    int main(int argc, const char *argv[])
+    {
+        try
+        {
+            init_load_config(argc, argv);
+            std::cout << "主线程id:" << std::this_thread::get_id() << std::endl;
+            std::cout << "0:name:" << GameConfig::get_instance()->get_config_string("name") << std::endl;
+            std::cout << "0:object.currency:" << GameConfig::get_instance()->get_config_string("object.currency") << std::endl;
+            std::cout << "1:pi:" << GameConfig::get_instance()->get_config_float("pi") << std::endl;
+            // init_db();
+            // init_server();
+
+            // boost::thread_group threads;
+            // threads.create_thread(&init_server);
+            // // threads.create_thread(&init_db);
+            // threads.join_all();
+
+            std::thread{&init_server}.detach();
+
+            std::cout << "主线程id:" << std::this_thread::get_id() << std::endl;
+            ScriptEngine::get_instance()->Init("script.gafq");
+            // 注册一下gafq的函数
+            init_gafq_func();
+            while (true)
+            {
+
+                // std::this_thread::sleep(boost::posix_time::seconds(1));
+                // std::this_thread::sleep(boost::posix_time::milliseconds(1000));
+                std::chrono::milliseconds dura(1000);
+                std::this_thread::sleep_for(dura);
+                ScriptEngine::get_instance()->LoopExecute();
+
+                // std::cout << "主线程id:" << std::this_thread::get_id() << std::endl;
+            }
+            return 0;
+        }
+        catch (boost::filesystem::filesystem_error &ex)
+        {
+            std::cerr << ex.code().message() << '\n';
+        }
+    }

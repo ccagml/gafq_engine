@@ -9,8 +9,39 @@ extern "C"
 #include "script_engine.h"
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
+#include <thread>
 
 ScriptEngine *ScriptEngine::script_eng = nullptr;
+
+int gafq_func1(gafq_State *L)
+{
+    int a = gafq_tointeger(L, 1); // First argument
+    int b = gafq_tointeger(L, 2); // Second argument
+    int result = a + b;
+
+    gafq_pushinteger(L, result);
+    return 1;
+}
+int gafq_func2(gafq_State *L)
+{
+    int a = gafq_tointeger(L, 1); // First argument
+    int b = gafq_tointeger(L, 2); // Second argument
+    int result = a + b;
+
+    gafq_pushinteger(L, result);
+    return 1;
+}
+int gafq_func3(gafq_State *L)
+{
+    int a = gafq_tointeger(L, 1); // First argument
+    int b = gafq_tointeger(L, 2); // Second argument
+    int result = a + b;
+
+    gafq_pushinteger(L, result);
+    return 1;
+}
+
+const gafqL_Reg regs[] = {{"gafq_func1", &gafq_func1}, {"gafq_func2", &gafq_func2}, {NULL, NULL}};
 
 bool ScriptEngine::Init(std::string init_file)
 {
@@ -19,10 +50,14 @@ bool ScriptEngine::Init(std::string init_file)
     this->se_gafqState = gafqL_newstate();
     gafqL_openlibs(this->se_gafqState);
     // gafqL_loadfile(this->se_gafqState, this->init_file.c_str());
-    // luaL_loadfile just loads the file, it does not run it. Try luaL_dofile instead.
+    // gafqL_loadfile just loads the file, it does not run it. Try gafqL_dofile instead.
     gafqL_dofile(this->se_gafqState, this->init_file.c_str());
     gafq_newtable(this->se_gafqState);
     gafq_pcall(this->se_gafqState, 0, 0, 0);
+    std::cout << "Init1" << std::endl;
+    // gafqL_register(this->se_gafqState, NULL, regs);
+    gafq_register(this->se_gafqState, "gafq_func3", gafq_func3);
+    std::cout << "Init2" << std::endl;
     return true;
 };
 
@@ -110,11 +145,15 @@ void ScriptEngine::LoopExecute()
 //     }
 // }
 
+// void engine_loop() {}
+
 // int main(int argc, char const *argv[])
 // {
 //     /* code */
 
 //     ScriptEngine::get_instance()->Init("script.gafq");
+
+//     // std::thread{&engine_loop}.detach();
 //     int i = 0;
 //     while (true)
 //     {
@@ -124,12 +163,9 @@ void ScriptEngine::LoopExecute()
 //         std::cin >> foo->action;
 //         std::cout << "data:" << std::endl;
 //         std::cin >> foo->data;
-//         ScriptEngine::get_instance()->ExecGafq(std::string(), -1, 1, foo, 1, 1, std::string());
-//         if (i > 3)
-//         {
-//             i = 0;
-//             ScriptEngine::get_instance()->LoopExecute();
-//         }
+//         ScriptEngine::get_instance()->ExecGafq(std::string(), -1, foo, 1, std::string());
+
+//         ScriptEngine::get_instance()->LoopExecute();
 //     }
 //     // boost::thread_group threads;
 //     // for (int i = 0; i < 30; ++i)

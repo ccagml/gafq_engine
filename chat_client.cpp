@@ -126,6 +126,7 @@ int main(int argc, char *argv[])
     char line[socket_msg::max_body_length + 1];
     while (std::cin.getline(line, socket_msg::max_body_length + 1))
     {
+        //{"action":"foo","data":"{\"from\":1,\"to\":2,\"info\":\"sss\"}"}
         using namespace std; // For strlen and memcpy.
         socket_msg msg;
         msg.body_length(strlen(line));

@@ -14,7 +14,7 @@ public:
     };
     enum
     {
-        max_body_length = 12
+        max_body_length = 1024
     };
 
     socket_msg() : body_length_(0) {}

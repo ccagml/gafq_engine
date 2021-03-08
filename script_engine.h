@@ -47,6 +47,7 @@ public:
         return script_eng;
     }
 
+    gafq_State *get_gafq_State() { return this->se_gafqState; }
     bool Init(std::string init_file);
     void ExecGafq(std::string gafq_content = std::string(), int fd = -1, std::shared_ptr<ScriptEngineMsgBase> msg = nullptr, int status = 1, std::string errinfo = std::string());
     void LoopExecute(); // 循环执行

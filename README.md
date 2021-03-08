@@ -31,8 +31,15 @@ gdb
     run
 
 
+
 format
+/root/.vscode-server/data/Machine/settings.json
+拓展->c++ -> C_Cpp: Clang_format_fallback Style
 { BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 200, AccessModifierOffset: -4, NamespaceIndentation: All, FixNamespaceComments: true }
+
+自动格式化
+文本编辑器->正在格式化
+formatOnSave
 
 
 
@@ -43,3 +50,20 @@ coredump
 ulimit -S -c unlimited > /dev/null 2>&1
 
 kill -11 pid
+
+
+start server
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/gafq_engine/3rd/mysqlcapi/lib:/root/gafq_engine/3rd/gafq/lib
+./game --props ./config.json
+
+
+./chat_client 0.0.0.0 6000 1
+./chat_client 0.0.0.0 6001 1
+
+client data
+{"oper":"send_data","from":3,"to":6,"info":"sss"}
+{"oper":"send_data","from":6,"to":3,"info":"sss"}
+
+{"oper":"send_data","from":5,"to":6,"info":"sss"}
+{"oper":"send_data","from":6,"to":5,"info":"sss"}
+{"oper":"update_self"}

@@ -1,4 +1,6 @@
 {
+    "host": "0,0,0,0",
+    "port": 6001,
     "pi": 3.141,
     "happy": true,
     "name": "Boost",
